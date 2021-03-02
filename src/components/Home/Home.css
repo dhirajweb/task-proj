@@ -1,0 +1,28 @@
+.edit-btn, .update-btn, .add-btn {
+    margin-right: 10px !important;
+}
+
+.search-bar {
+    float: right;
+    clear: both;
+}
+
+@media screen and (max-width: 875px) {
+    .edit-btn {
+        margin-right: 0px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .search-bar {
+        float: right;
+        clear: both;
+    }
+}
+
+@media screen and (max-width: 420px) {
+    .search-bar {
+        float: none;
+        margin-bottom: 10px !important;
+        width: 100%;
+    }
+}  
