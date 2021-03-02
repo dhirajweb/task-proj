@@ -8,6 +8,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Alert from '../Alert/Alert'
+import Loader from '../Loader/Loader'
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -38,6 +39,7 @@ const Add = (props) => {
     const [showAlert, setShowAlert] = useState(false)
     const [severity, setSeverity] = useState(null)
     const [message, setMessage] = useState(null)
+    const [loading, setLoading] = useState(false)
 
     const validateEmail = (email) => {
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -57,14 +59,17 @@ const Add = (props) => {
     }
 
     const sendData = () => {
+        setLoading(true)
         fetch(`https://c0ri699qs5.execute-api.us-east-1.amazonaws.com/v1/add?param1=${email}&param2=${firstName}&param3=${lastName}&param4=${pincode}&param5=${city}&param6=${state}`)
         .then(response => response.json())
         .then(data => {
             if(data.Success && data.Message === 'Client name is already present') {
+                setLoading(false)
                 setMessage(data.Message)
                 setSeverity('error')
                 setShowAlert(true)
             } else if(data.Success) {
+                setLoading(false)
                 setMessage(data.Message)
                 setSeverity('success')
                 setShowAlert(true)
@@ -77,6 +82,7 @@ const Add = (props) => {
             }
         })
         .catch(error => {
+            setLoading(false)
             setMessage("Something wen't wrong")
             setSeverity('error')
             setShowAlert(true)
@@ -158,6 +164,9 @@ const Add = (props) => {
                 {showAlert?
                     <Alert alertMessage={message} severity={severity} showAlert={showAlert} setShowAlert={setShowAlert}/>:null
                 }
+                {loading?
+                    <Loader open={loading}/>:null
+                }       
             </Grid>
         </div>
     )

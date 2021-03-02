@@ -8,6 +8,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Alert from '../Alert/Alert'
+import Loader from '../Loader/Loader'
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -38,6 +39,7 @@ const Edit = (props) => {
     const [showAlert, setShowAlert] = useState(false)
     const [severity, setSeverity] = useState(null)
     const [message, setMessage] = useState(null)
+    const [loading, setLoading] = useState(false)
 
     const validatePincode = (pincode) => {
         if(isNaN(pincode)) {
@@ -52,16 +54,19 @@ const Edit = (props) => {
     }
 
     const updateData = () => {
+        setLoading(true)
         fetch(`https://o1wm686yz2.execute-api.us-east-1.amazonaws.com/v1/edit?param1=${email}&param2=${firstName}&param3=${lastName}&param4=${pincode}&param5=${city}&param6=${state}`)
         .then(response => response.json())
         .then(data => {
             if(data.Success) {
+                setLoading(false)
                 setMessage(data.Message)
                 setSeverity('success')
                 setShowAlert(true)
             }
         })
         .catch(error => {
+            setLoading(false)
             setMessage("Something wen't wrong")
             setSeverity('error')
             setShowAlert(true)
@@ -80,6 +85,7 @@ const Edit = (props) => {
     }
 
     const getData = () => {
+        setLoading(true)
         fetch('https://j5ej5u32gg.execute-api.us-east-1.amazonaws.com/v1/fetch')
         .then(response => response.json())
         .then(data => {
@@ -91,9 +97,11 @@ const Edit = (props) => {
                 setState(userInfo[0].states)
                 setCity(userInfo[0].city)
                 setPincode(userInfo[0].pincode)
+                setLoading(false)
             }
         })
         .catch(error => {
+            setLoading(false)
             setMessage("Something wen't wrong")
             setSeverity('error')
             setShowAlert(true)
@@ -161,6 +169,9 @@ const Edit = (props) => {
                 </Grid>
                 {showAlert?
                     <Alert alertMessage={message} severity={severity} showAlert={showAlert} setShowAlert={setShowAlert}/>:null
+                }
+                {loading?
+                    <Loader open={loading}/>:null
                 }
             </Grid>
         </div>

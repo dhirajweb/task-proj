@@ -15,6 +15,7 @@ import { withRouter } from 'react-router';
 import Dialog from '@material-ui/core/Dialog';
 import Alert from '../Alert/Alert'
 import './Home.css'
+import Loader from '../Loader/Loader'
 
 const useStyles = makeStyles({
     table: {
@@ -44,12 +45,15 @@ const Home = (props) => {
     const [message, setMessage] = useState(null)
     const [severity, setSeverity] = useState(null)
     const [isSearch, setIsSearch] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const getListItems = () => {
+        setLoading(true)
         fetch('https://j5ej5u32gg.execute-api.us-east-1.amazonaws.com/v1/fetch')
         .then(response => response.json())
         .then(data => {
             setListItems(data.data)
+            setLoading(false)
         });
     }
 
@@ -58,26 +62,30 @@ const Home = (props) => {
             setIsSearch(false)
         } else {
             setIsSearch(true)
+            setLoading(true)
             const filteredData = listItems.filter(item => {
                 return Object.keys(item).some(key =>
                   item[key].toLowerCase().includes(searchVal.toLowerCase())
                 );
             });
             setListItems(filteredData)
-            console.log(filteredData)
+            setLoading(false)
         }
     }
 
     const deleteListItem = (email) => {
+        setLoading(true)
         fetch(`https://k6j938wg66.execute-api.us-east-1.amazonaws.com/v1/delete?param1=${email}`)
         .then(response => response.json())
         .then(data => {
             setOpenDeleteConf(false)
+            setLoading(false)
             setMessage(data.Message)
             setSeverity('success')
             setShowAlert(true)
         })
         .catch(error => {
+            setLoading(false)
             setMessage("Something wen't wrong")
             setSeverity('error')
             setShowAlert(true)
@@ -101,7 +109,7 @@ const Home = (props) => {
             getListItems();
         }
         sessionStorage.removeItem('userEmail')
-    }, [listItems, openDeleteConf, isSearch])
+    }, [openDeleteConf, isSearch])
     return (
         <div style={{ margin: '20px', marginTop: '40px', textAlign: 'left'}}>
             <Typography variant="h6"
@@ -174,6 +182,9 @@ const Home = (props) => {
             }
             {showAlert?
                 <Alert alertMessage={message} severity={severity} showAlert={showAlert} setShowAlert={setShowAlert}/>:null
+            }
+            {loading?
+                <Loader open={loading}/>:null
             }
         </div>
     )
